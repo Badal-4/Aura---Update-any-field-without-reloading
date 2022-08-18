@@ -1,0 +1,32 @@
+updateLastAcc : function(component,event,helper,rcdId)
+  {     
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        today = yyyy + '-' + mm + '-' + dd;
+        var action = component.get("c.updateLastAcc");
+        action.setParams({
+            "recordId" : rcdId,
+            "d" : today
+        });
+        action.setCallback(this,function(response)
+        {
+            var state = response.getState();
+            if(state === "SUCCESS")
+            {
+                var arr_reports = component.get("v.reportlist");
+                if(!$A.util.isEmpty(arr_reports)){
+                    for(var i=0; i < arr_reports.length; i++){
+                        arr_reports[i].LastAccessed__c = today;
+                    }
+                    component.set("v.reportlist",arr_reports);
+                }
+            }
+            else 
+            {
+                console.log('Error update-->'+JSON.stringify(response.getError()));
+            }
+        });
+        $A.enqueueAction(action);   
+  }
